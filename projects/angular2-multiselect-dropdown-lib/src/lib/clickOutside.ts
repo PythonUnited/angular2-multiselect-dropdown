@@ -13,6 +13,14 @@ export class ClickOutsideDirective {
     @HostListener('document:click', ['$event', '$event.target'])
     @HostListener('document:touchstart', ['$event', '$event.target'])
     public onClick(event: MouseEvent, targetElement: HTMLElement): void {
+        /* if we're inside shadow root the event.target points to this root
+           so check for the event.path or oroginalTarget to fix this */
+        if ((event as any).path) {
+            targetElement = (event as any).path[0];
+        } else if ((event as any).originalTarget) {
+            targetElement = (event as any).originalTarget;
+        }
+       
         if (!targetElement) {
             return;
         }

@@ -362,8 +362,10 @@ export class AngularMultiSelect implements OnInit, ControlValueAccessor, OnChang
         if (item.disabled) {
             return;
         }
-        if (this.settings.singleSelection) {
+        if (!this.selectedItems) {
             this.selectedItems = [];
+        }
+        if (this.settings.singleSelection) {
             this.selectedItems.push(item);
             this.closeDropdown();
         }
@@ -523,7 +525,7 @@ export class AngularMultiSelect implements OnInit, ControlValueAccessor, OnChang
                                         });
                                     }
                                     this.updateGroupInfo(item);
-                
+
                                 }); */
 
                 this.ds.getFilteredData().forEach((el: any) => {
