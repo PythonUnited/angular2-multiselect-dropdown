@@ -4,11 +4,22 @@ import { Directive, ElementRef, Output, EventEmitter, HostListener, Input, OnIni
     selector: '[clickOutside]'
 })
 export class ClickOutsideDirective {
+
+    private allowClose = true;
+
     constructor(private _elementRef: ElementRef) {
     }
 
     @Output()
     public clickOutside = new EventEmitter<MouseEvent>();
+
+    @HostListener('click', ['$event'])
+    @HostListener('touchstart', ['$event'])
+    public clickInside(event: MouseEvent) {
+      // set toggle so we can stop the outside click detection from
+      // closing the dropdown (see https://stackoverflow.com/a/48564655/4498986)
+      this.allowClose = false;
+    }
 
     @HostListener('document:click', ['$event', '$event.target'])
     @HostListener('document:touchstart', ['$event', '$event.target'])
@@ -20,15 +31,16 @@ export class ClickOutsideDirective {
         } else if ((event as any).originalTarget) {
             targetElement = (event as any).originalTarget;
         }
-       
+
         if (!targetElement) {
             return;
         }
 
         const clickedInside = this._elementRef.nativeElement.contains(targetElement);
-        if (!clickedInside) {
+        if (!clickedInside && this.allowClose) {
             this.clickOutside.emit(event);
         }
+        this.allowClose = true;
     }
 }
 
